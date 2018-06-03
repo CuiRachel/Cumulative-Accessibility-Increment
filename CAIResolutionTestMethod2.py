@@ -77,12 +77,9 @@ def CAIIndexAlterTable(tableName, percentOpt):
         columnName="maxindex"
         alterTableAddColumn(tableName,columnName)
     else:
-        columnName1="p{}thup".format(percentOpt)
-        columnName2="p{}thdown".format(percentOpt)
-        alterTableAddColumn(tableName,columnName1)
-        alterTableAddColumn(tableName,columnName2)
-
-
+        columnName="p{}thindex".format(percentOpt)
+        alterTableAddColumn(tableName,columnName)
+        
 def CAIIndexCal(percentOpt,dataSource,unit):#dataSource refers to each line of the aggreagated CAI tables,unit is the resolution of the test
     maxValue=0
     maxIndex=0
@@ -95,44 +92,30 @@ def CAIIndexCal(percentOpt,dataSource,unit):#dataSource refers to each line of t
                 maxIndex=i*unit
             buildArray.append(access)
     if percentOpt==100:
-        CAIOutputUp=maxIndex
-        CAIOutputDown=maxIndex
+        CAIOutput=maxIndex
     else:
         accessArray=np.array(buildArray)
         pth=np.percentile(accessArray,percentOpt)
-        pthDifUp=99999999
-        pthDifDown=99999999
-        pthIndexUp=0
-        pthIndexDown=0
-
+        pthDif=99999999
+        pthIndex=0
         for i, access in enumerate(dataSource):
-            if i!=0:
-                if i*unit>maxIndex:
-                    if abs(access-pth)<pthDifUp:
-                        pthDifUp=abs(access-pth)
-                        pthIndexUp=i*unit
-                else:
-                    if abs(access-pth)<pthDifDown:
-                        pthDifDown=abs(access-pth)
-                        pthIndexDown=i*unit
-        CAIOutputDown=pthIndexDown
-        CAIOutputUp=pthIndexUp
-    return CAIOutputUp, CAIOutputDown
+            if i!=0: 
+                if abs(access-pth)<pthDif:
+                    pthDif=abs(access-pth)
+                    pthIndex=i*unit                   
+        CAIOutput=pthIndex
+    return CAIOutput
     
-def CAIIndexUpdateTable(geoID, percentOpt,CAIOutputUp,CAIOutputDown,tableName):
+def CAIIndexUpdateTable(geoID, percentOpt,CAIOutput,tableName):
     table="{}.{}".format(schema, tableName)
     if percentOpt==100:
         columnName="maxindex"
-        cur.execute("update {} set {}={} where b_geoid={}".format(table, columnName, CAIOutputUp, geoID))
+        cur.execute("update {} set {}={} where b_geoid={}".format(table, columnName, CAIOutput, geoID))
         conn.commit()
     else:
-        columnName1="p{}thup".format(percentOpt)
-        columnName2="p{}thdown".format(percentOpt)
-        cur.execute("update {} set {}={} where b_geoid={}".format(table, columnName1, CAIOutputUp, geoID))
-        cur.execute("update {} set {}={} where b_geoid={}".format(table, columnName2, CAIOutputDown, geoID))
+        columnName="p{}th".format(percentOpt)
+        cur.execute("update {} set {}={} where b_geoid={}".format(table, columnName, CAIOutput, geoID))
         conn.commit()
-
-
 
 for unit in aggreUnit:
     print("Working on Unit={}min".format(unit))
@@ -151,8 +134,8 @@ for unit in aggreUnit:
                 if i<=roundNum:
                     dataSource.append(access)
             #print(geoID)
-            CAIOutputUp, CAIOutputDown=CAIIndexCal(percentOpt,dataSource,unit)            
-            CAIIndexUpdateTable(geoID, percentOpt, CAIOutputUp, CAIOutputDown, aggreTableName)
+            CAIOutput=CAIIndexCal(percentOpt,dataSource,unit)            
+            CAIIndexUpdateTable(geoID, percentOpt, CAIOutput, aggreTableName)
         
         
         
