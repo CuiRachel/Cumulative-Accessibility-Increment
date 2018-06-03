@@ -113,7 +113,7 @@ def CAIIndexUpdateTable(geoID, percentOpt,CAIOutput,tableName):
         cur.execute("update {} set {}={} where b_geoid={}".format(table, columnName, CAIOutput, geoID))
         conn.commit()
     else:
-        columnName="p{}th".format(percentOpt)
+        columnName="p{}thindex".format(percentOpt)
         cur.execute("update {} set {}={} where b_geoid={}".format(table, columnName, CAIOutput, geoID))
         conn.commit()
 
