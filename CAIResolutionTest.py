@@ -107,7 +107,7 @@ def CAIIndexCal(percentOpt,dataSource,unit):#dataSource refers to each line of t
 
         for i, access in enumerate(dataSource):
             if i!=0:
-                if i>maxIndex:
+                if i*unit>maxIndex:
                     if abs(access-pth)<pthDifUp:
                         pthDifUp=abs(access-pth)
                         pthIndexUp=i*unit
