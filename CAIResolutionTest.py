@@ -1,11 +1,3 @@
-### This script is to
-
-## 1. Aggregate 1min cumulative accessibility increment data to 2min, 3min, 5min and 10min for resolution tests
-
-## 2. Identify the maximum CAI index, 10th, 50th and 90th CAI index for each unit of cumulative accessibility increment
-
-## The output is used for the travel time estimation models
-
 import csv
 import os
 import math
@@ -91,7 +83,7 @@ def CAIIndexAlterTable(tableName, percentOpt):
         alterTableAddColumn(tableName,columnName2)
 
 
-def CAIIndexCal(percentOpt,dataSource):#dataSource refers to each line of the aggreagated CAI tables
+def CAIIndexCal(percentOpt,dataSource,unit):#dataSource refers to each line of the aggreagated CAI tables,unit is the resolution of the test
     maxValue=0
     maxIndex=0
     buildArray=[]
@@ -100,7 +92,7 @@ def CAIIndexCal(percentOpt,dataSource):#dataSource refers to each line of the ag
         if i!=0:
             if access>maxValue:                
                 maxValue=access
-                maxIndex=i*percentOpt
+                maxIndex=i*unit
             buildArray.append(access)
     if percentOpt==100:
         CAIOutputUp=maxIndex
@@ -118,11 +110,11 @@ def CAIIndexCal(percentOpt,dataSource):#dataSource refers to each line of the ag
                 if i>maxIndex:
                     if abs(access-pth)<pthDifUp:
                         pthDifUp=abs(access-pth)
-                        pthIndexUp=i*percentOpt
+                        pthIndexUp=i*unit
                 else:
                     if abs(access-pth)<pthDifDown:
                         pthDifDown=abs(access-pth)
-                        pthIndexDown=i*percentOpt
+                        pthIndexDown=i*unit
         CAIOutputDown=pthIndexDown
         CAIOutputUp=pthIndexUp
     return CAIOutputUp, CAIOutputDown
@@ -159,7 +151,7 @@ for unit in aggreUnit:
                 if i<=roundNum:
                     dataSource.append(access)
             #print(geoID)
-            CAIOutputUp, CAIOutputDown=CAIIndexCal(percentOpt,dataSource)            
+            CAIOutputUp, CAIOutputDown=CAIIndexCal(percentOpt,dataSource,unit)            
             CAIIndexUpdateTable(geoID, percentOpt, CAIOutputUp, CAIOutputDown, aggreTableName)
         
         
