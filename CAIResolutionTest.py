@@ -100,7 +100,7 @@ def CAIIndexCal(percentOpt,dataSource):#dataSource refers to each line of the ag
         if i!=0:
             if access>maxValue:                
                 maxValue=access
-                maxIndex=i
+                maxIndex=i*percentOpt
             buildArray.append(access)
     if percentOpt==100:
         CAIOutputUp=maxIndex
@@ -118,11 +118,11 @@ def CAIIndexCal(percentOpt,dataSource):#dataSource refers to each line of the ag
                 if i>maxIndex:
                     if abs(access-pth)<pthDifUp:
                         pthDifUp=abs(access-pth)
-                        pthIndexUp=i
+                        pthIndexUp=i*percentOpt
                 else:
                     if abs(access-pth)<pthDifDown:
                         pthDifDown=abs(access-pth)
-                        pthIndexDown=i
+                        pthIndexDown=i*percentOpt
         CAIOutputDown=pthIndexDown
         CAIOutputUp=pthIndexUp
     return CAIOutputUp, CAIOutputDown
